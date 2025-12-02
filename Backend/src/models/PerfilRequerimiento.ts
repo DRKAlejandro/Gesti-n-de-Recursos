@@ -56,7 +56,6 @@ PerfilRequerimiento.init(
             defaultValue: 1,
             validate: {
                 min: 1,
-                max: 10,
             },
         },
     },

@@ -66,7 +66,87 @@ async function seedDatabase() {
             return;
         }
 
-        
+        // Roles
+        const roles = await Rol.bulkCreate([
+            { nombre_rol: 'Desarrollador', descripcion: 'Desarrollador de software' },
+            { nombre_rol: 'Diseñador', descripcion: 'Diseñador UI/UX' },
+            { nombre_rol: 'Gerente', descripcion: 'Gerente de proyecto' },
+            { nombre_rol: 'Soporte Técnico', descripcion: 'Soporte TI' },
+        ]);
+
+        // Requerimientos
+        await PerfilRequerimiento.bulkCreate([
+            // Desarrollador
+            { rol_id: 1, tipo_equipo: 'Laptop', cantidad_requerida: 1 },
+            { rol_id: 1, tipo_equipo: 'Monitor', cantidad_requerida: 2 },
+            { rol_id: 1, tipo_equipo: 'Dock', cantidad_requerida: 1 },
+            // Diseñador
+            { rol_id: 2, tipo_equipo: 'Laptop', cantidad_requerida: 1 },
+            { rol_id: 2, tipo_equipo: 'Monitor', cantidad_requerida: 2 },
+            { rol_id: 2, tipo_equipo: 'Tableta Gráfica', cantidad_requerida: 1 },
+            // Gerente
+
+            
+            { rol_id: 3, tipo_equipo: 'Laptop', cantidad_requerida: 1 },
+            { rol_id: 3, tipo_equipo: 'Monitor', cantidad_requerida: 1 },
+            // Soporte
+            { rol_id: 4, tipo_equipo: 'Laptop', cantidad_requerida: 1 },
+            { rol_id: 4, tipo_equipo: 'Monitor', cantidad_requerida: 1 },
+        ]);
+
+        // Empleados
+        await Empleado.bulkCreate([
+            {
+                nombre_completo: 'Administrador',
+                rol_actual: 'Admin',
+                email: 'admin@mail.com',
+                activo: true,
+            },
+            {
+                nombre_completo: 'Juan Pérez López',
+                rol_actual: 'Desarrollador',
+                email: 'juan.perez@mail.com',
+                activo: true,
+            },
+            {
+                nombre_completo: 'Ana Gómez Rodríguez',
+                rol_actual: 'Diseñador',
+                email: 'ana.gomez@mail.com',
+                activo: true,
+            },
+        ]);
+
+        // Equipos
+        await Equipo.bulkCreate([
+            {
+                tipo_equipo: 'Laptop',
+                modelo: 'Dell XPS 15 9520',
+                numero_serie: 'XPS-001-2024',
+                estado: 'disponible',
+                costo: 24500.00
+            },
+            {
+                tipo_equipo: 'Monitor',
+                modelo: 'Dell UltraSharp U2723QE',
+                numero_serie: 'MON-001-2024',
+                estado: 'disponible',
+                costo: 8999.99,
+            },
+            {
+                tipo_equipo: 'Laptop',
+                modelo: 'Apple MacBook Pro 14"',
+                numero_serie: 'MBP-001-2024',
+                estado: 'asignado',
+                costo: 42999.00,
+            },
+            {
+                tipo_equipo: 'Tableta Gráfica',
+                modelo: 'Wacom Intuos Pro Medium',
+                numero_serie: 'WAC-001-2024',
+                estado: 'disponible',
+                costo: 12499.50
+            },
+        ]);
 
     } catch (error) {
         console.error('Error creando datos: ', error);

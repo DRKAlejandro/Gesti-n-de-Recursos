@@ -8,8 +8,6 @@ interface EquipoAttributes {
     numero_serie: string;
     estado: 'disponible' | 'asignado' | 'baja' | 'mantenimiento';
     costo: number;
-    especificaciones: Record<string, any>;
-    empleado_id?: number | null;
     created_at?: Date;
     updated_at?: Date;
 }
@@ -24,8 +22,6 @@ class Equipo extends Model<EquipoAttributes, EquipoCreationAttributes>
     public numero_serie!: string;
     public estado!: 'disponible' | 'asignado' | 'baja' | 'mantenimiento';
     public costo!: number;
-    public especificaciones!: Record<string, any>;
-    public empleado_id!: number | null;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
 }
@@ -74,23 +70,7 @@ Equipo.init(
                 min: 0,
                 isDecimal: true,
             },
-        },
-        especificaciones: {
-            type: DataTypes.JSON,
-            defaultValue: {},
-            validate: {
-                isObject(value: any) {
-                    if (typeof value !== 'object' || Array.isArray(value)) {
-                        throw new Error('Las especificaciones deben ser un objeto JSON');
-                    }
-                },
-            },
-        },
-        empleado_id: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: null,
-        },
+        }
     },
     {
         sequelize,
