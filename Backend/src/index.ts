@@ -68,6 +68,7 @@ async function seedDatabase() {
 
         // Roles
         const roles = await Rol.bulkCreate([
+            { nombre_rol: 'Administrador', descripcion: 'Administrador general' },
             { nombre_rol: 'Desarrollador', descripcion: 'Desarrollador de software' },
             { nombre_rol: 'Diseñador', descripcion: 'Diseñador UI/UX' },
             { nombre_rol: 'Gerente', descripcion: 'Gerente de proyecto' },
