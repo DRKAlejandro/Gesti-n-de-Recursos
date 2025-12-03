@@ -8,6 +8,7 @@ import {
     PerfilRequerimiento,
 } from "./models";
 import equiposRouter from "./routes/equipos";
+import solicitudesRouter  from "./routes/solicitudes";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
 
 // Rutas
 app.use("/api/equipos", equiposRouter);
+app.use("/api/solicitudes", solicitudesRouter);
 
 app.get("/", (req, res) => {
     res.json({
@@ -54,10 +56,6 @@ app.get("/", (req, res) => {
         },
     });
 });
-
-
-
-
 
 
 app.get("/health", async (req, res) => {
