@@ -15,6 +15,7 @@ export interface EquipoInput {
     numero_serie: string;
     estado?: 'disponible' | 'asignado' | 'baja' | 'mantenimiento';
     costo: number;
+    rendimiento: number;
 }
 
 // Interfaz para actualizar (Continuar funcionalidad más adelante en caso de ser necesaria)
@@ -24,6 +25,7 @@ export interface EquipoUpdateInput {
     numero_serie?: string;
     estado?: 'disponible' | 'asignado' | 'baja' | 'mantenimiento';
     costo?: number;
+    rendimiento?: number;
 }
 
 // Función para listar equipos con filtros
@@ -102,6 +104,12 @@ export async function crearEquipo(equipoData: EquipoInput) {
             errores.push('El costo debe ser un número positivo');
         }
 
+        if (equipoData.rendimiento === undefined || equipoData.rendimiento === null) {
+            errores.push('El rendimiento es requerido');
+        } else if (typeof equipoData.rendimiento !== 'number' || equipoData.rendimiento < 0) {
+            errores.push('El rendimiento debe ser un número positivo');
+        }
+
         // Validar estado (solo si se proporciona) 
         if (equipoData.estado) {
             const estadosValidos = ['disponible', 'asignado', 'baja', 'mantenimiento'];
@@ -138,6 +146,7 @@ export async function crearEquipo(equipoData: EquipoInput) {
             numero_serie: equipoData.numero_serie.trim(),
             estado: equipoData.estado || 'disponible',
             costo: Number(equipoData.costo.toFixed(2)),
+            rendimiento: Number(equipoData.rendimiento),
         });
 
         const equipoCreado = await Equipo.findByPk(nuevoEquipo.id);
