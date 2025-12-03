@@ -5,6 +5,7 @@ import {
     Rol,
     PerfilRequerimiento
 } from '../models';
+import { generarPropuestaOptima } from './optimizadorService';
 
 // Interfaces
 export interface SolicitudInput {
@@ -263,6 +264,26 @@ export async function obtenerSolicitudPorId(id: number) {
         return {
             success: false,
             error: 'Error interno',
+            message: error.message,
+        };
+    }
+}
+
+// Función para generar propuesta óptima
+export async function generarPropuestaOptimaSolicitud(solicitudId: number) {
+    try {
+        const propuesta = await generarPropuestaOptima(solicitudId);
+        
+        return {
+            success: true,
+            data: propuesta,
+        };
+    } catch (error: any) {
+        console.error('Error generando propuesta óptima:', error);
+        
+        return {
+            success: false,
+            error: 'Error al generar propuesta',
             message: error.message,
         };
     }

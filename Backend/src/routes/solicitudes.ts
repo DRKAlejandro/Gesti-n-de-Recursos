@@ -4,6 +4,7 @@ import {
     listarSolicitudes,
     obtenerSolicitudPorId,
 } from '../services/solicitudService';
+import { generarPropuestaOptimaSolicitud } from "../services/solicitudService";
 
 const router = Router();
 
@@ -109,7 +110,38 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// GET /api/solicitudes/:id/propuesta-optima - Generar propuesta óptima
+router.get("/:id/propuesta-optima", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const solicitudId = parseInt(id);
 
+        if (isNaN(solicitudId)) {
+            return res.status(400).json({
+                success: false,
+                error: "ID inválido",
+                message: "El ID debe ser un número válido"
+            });
+        }
 
+        const resultado = await generarPropuestaOptimaSolicitud(solicitudId);
+
+        if (!resultado.success) {
+            return res.status(404).json(resultado);
+        }
+
+        res.json({
+            success: true,
+            ...resultado.data
+        });
+    } catch (error: any) {
+        console.error("Error generando propuesta óptima:", error);
+        res.status(500).json({
+            success: false,
+            error: "Error interno del servidor",
+            message: error.message,
+        });
+    }
+});
 
 export default router;
