@@ -6,6 +6,7 @@ interface PerfilRequerimientoAttributes {
     rol_id: number;
     tipo_equipo: string;
     cantidad_requerida: number;
+    prioridad: number;
     created_at?: Date;
     updated_at?: Date;
 }
@@ -23,6 +24,7 @@ class PerfilRequerimiento
     public rol_id!: number;
     public tipo_equipo!: string;
     public cantidad_requerida!: number;
+    public prioridad!: number;
 
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
@@ -56,6 +58,15 @@ PerfilRequerimiento.init(
             defaultValue: 1,
             validate: {
                 min: 1,
+            },
+        },
+        prioridad: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 1,
+            validate: {
+                min: 1,
+                max:100
             },
         },
     },

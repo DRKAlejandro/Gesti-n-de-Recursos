@@ -36,15 +36,79 @@ export interface PropuestaOptima {
 }
 
 export async function generarPropuestaOptima(solicitudId: number): Promise<PropuestaOptima> {
-    let mensaje = '';
-    mensaje = 'Pendiente';
+    let mensaje = 'Pendiente';
+    
+    try {
+        // Verificar que la solicitud existe
+        const solicitud = await SolicitudEquipamiento.findByPk(solicitudId);
+        
+        if (!solicitud) {
+            mensaje = `Solicitud con ID ${solicitudId} no encontrada`;
+            return {
+                solicitud_id: solicitudId,
+                asignaciones: [],
+                costo_total_estimado: 0,
+                faltantes: [],
+                mensaje
+            };
+        }
+        
+        // Obtener los detalles de la solicitud (roles y cantidades)
+        const detallesSolicitud = await DetalleSolicitud.findAll({
+            where: {
+                solicitud_id: solicitudId
+            },
+            include: [
+                {
+                    model: Rol,
+                    as: 'rol',
+                    attributes: ['id', 'nombre_rol']
+                }
+            ],
+            order: [['id', 'ASC']]
+        });
+        
+        if (detallesSolicitud.length === 0) {
+            mensaje = `La solicitud ${solicitudId} no tiene detalles (roles y cantidades) definidos`;            
+            return {
+                solicitud_id: solicitudId,
+                asignaciones: [],
+                costo_total_estimado: 0,
+                faltantes: [],
+                mensaje
+            };
+        }
+        
+        const inventarioDisponible = await Equipo.findAll({
+            where: {
+                estado: 'disponible'
+            },
+            order: [
+                ['tipo_equipo', 'ASC'],
+                ['costo', 'ASC'] 
+            ]
+        });
+        
+        const faltantes: Faltante[] = [];
 
-    return {
-            solicitud_id: 1,
+        return {
+            solicitud_id: solicitudId,
+            asignaciones: [], 
+            costo_total_estimado: 0, 
+            faltantes,
+            mensaje
+        };
+        
+    } catch (error) {
+        console.error('Error al generar propuesta óptima:', error);
+        mensaje = `Error: ${error instanceof Error ? error.message : 'Error desconocido'}`;
+        
+        return {
+            solicitud_id: solicitudId,
             asignaciones: [],
-            costo_total_estimado: 100,
+            costo_total_estimado: 0,
             faltantes: [],
             mensaje
         };
-
-}
+    }
+}0

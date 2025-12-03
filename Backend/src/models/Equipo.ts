@@ -8,6 +8,7 @@ interface EquipoAttributes {
     numero_serie: string;
     estado: 'disponible' | 'asignado' | 'baja' | 'mantenimiento';
     costo: number;
+    rendimiento: number;
     created_at?: Date;
     updated_at?: Date;
 }
@@ -22,6 +23,7 @@ class Equipo extends Model<EquipoAttributes, EquipoCreationAttributes>
     public numero_serie!: string;
     public estado!: 'disponible' | 'asignado' | 'baja' | 'mantenimiento';
     public costo!: number;
+    public rendimiento!: number; 
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
 }
@@ -70,6 +72,16 @@ Equipo.init(
                 min: 0,
                 isDecimal: true,
             },
+        },
+        rendimiento: { 
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 50, 
+            validate: {
+                min: 1,
+                max: 100,
+                isInt: true,
+            },
         }
     },
     {
@@ -86,6 +98,10 @@ Equipo.init(
             {
                 name: 'idx_equipo_tipo',
                 fields: ['tipo_equipo'],
+            },
+            {
+                name: 'idx_equipo_rendimiento', 
+                fields: ['rendimiento'],
             },
         ],
     }
