@@ -1,6 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import { sequelize, Equipo, Empleado, Rol, PerfilRequerimiento } from './models';
+import express from "express";
+import cors from "cors";
+import {
+    sequelize,
+    Equipo,
+    Empleado,
+    Rol,
+    PerfilRequerimiento,
+} from "./models";
+import equiposRouter from "./routes/equipos";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,33 +15,80 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.get('/health', async (req, res) => {
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
+
+// Rutas
+app.use("/api/equipos", equiposRouter);
+
+app.get("/", (req, res) => {
+    res.json({
+        nombre: "API de Gestión de Recursos TI",
+        version: "1.0.0",
+        descripcion: "Sistema para gestión y optimización de equipos tecnológicos",
+        endpoints: {
+            equipos: {
+                listar: {
+                    method: "GET",
+                    url: "/api/equipos",
+                    query_params: {
+                        estado: "opcional (disponible, asignado, baja, mantenimiento)",
+                        tipo_equipo: "opcional (Laptop, Monitor, etc)",
+                    },
+                },
+                crear: {
+                    method: "POST",
+                    url: "/api/equipos",
+                    body_example: {
+                        tipo_equipo: "Laptop",
+                        modelo: "Dell XPS 15",
+                        numero_serie: "XPS-001",
+                        costo: 25000.5,
+                        estado: "disponible",
+                    },
+                },
+            },
+            solicitudes: "Próximamente...",
+        },
+    });
+});
+
+
+
+
+
+
+app.get("/health", async (req, res) => {
     try {
         await sequelize.authenticate();
         res.json({
-            status: 'healthy',
-            database: 'connected',
+            status: "healthy",
+            database: "connected",
             timestamp: new Date().toISOString(),
         });
     } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        const errorMessage =
+            error instanceof Error ? error.message : "Error desconocido";
         res.status(500).json({
-            status: 'unhealthy',
-            database: 'disconnected',
+            status: "unhealthy",
+            database: "disconnected",
             error: errorMessage,
         });
     }
 });
 
 // Ver tablas
-app.get('/tables', async (req, res) => {
+app.get("/tables", async (req, res) => {
     try {
         const [tables] = await sequelize.query(
             "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
         );
         res.json({ tables });
     } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        const errorMessage =
+            error instanceof Error ? error.message : "Error desconocido";
         res.status(500).json({ error: errorMessage });
     }
 });
@@ -42,18 +96,19 @@ app.get('/tables', async (req, res) => {
 // Sincronizar base de datos
 async function syncDatabase() {
     try {
-        console.log('Sincronizando base de datos');
+        console.log("Sincronizando base de datos");
 
-        const forceSync = process.env.NODE_ENV === 'development' && process.env.FORCE_SYNC === 'true';
+        const forceSync =
+            process.env.NODE_ENV === "development" &&
+            process.env.FORCE_SYNC === "true";
 
         await sequelize.sync({ force: forceSync });
-        console.log('Base de datos sincronizada');
+        console.log("Base de datos sincronizada");
 
         // Ejecutar seeder en caso de no haber datos
         await seedDatabase();
-
     } catch (error) {
-        console.error('Error sincronizando:', error);
+        console.error("Error sincronizando:", error);
         process.exit(1);
     }
 }
@@ -68,51 +123,50 @@ async function seedDatabase() {
 
         // Roles
         const roles = await Rol.bulkCreate([
-            { nombre_rol: 'Administrador', descripcion: 'Administrador general' },
-            { nombre_rol: 'Desarrollador', descripcion: 'Desarrollador de software' },
-            { nombre_rol: 'Diseñador', descripcion: 'Diseñador UI/UX' },
-            { nombre_rol: 'Gerente', descripcion: 'Gerente de proyecto' },
-            { nombre_rol: 'Soporte Técnico', descripcion: 'Soporte TI' },
+            { nombre_rol: "Administrador", descripcion: "Administrador general" },
+            { nombre_rol: "Desarrollador", descripcion: "Desarrollador de software" },
+            { nombre_rol: "Diseñador", descripcion: "Diseñador UI/UX" },
+            { nombre_rol: "Gerente", descripcion: "Gerente de proyecto" },
+            { nombre_rol: "Soporte Técnico", descripcion: "Soporte TI" },
         ]);
 
         // Requerimientos
         await PerfilRequerimiento.bulkCreate([
             // Desarrollador
-            { rol_id: 1, tipo_equipo: 'Laptop', cantidad_requerida: 1 },
-            { rol_id: 1, tipo_equipo: 'Monitor', cantidad_requerida: 2 },
-            { rol_id: 1, tipo_equipo: 'Dock', cantidad_requerida: 1 },
+            { rol_id: 1, tipo_equipo: "Laptop", cantidad_requerida: 1 },
+            { rol_id: 1, tipo_equipo: "Monitor", cantidad_requerida: 2 },
+            { rol_id: 1, tipo_equipo: "Dock", cantidad_requerida: 1 },
             // Diseñador
-            { rol_id: 2, tipo_equipo: 'Laptop', cantidad_requerida: 1 },
-            { rol_id: 2, tipo_equipo: 'Monitor', cantidad_requerida: 2 },
-            { rol_id: 2, tipo_equipo: 'Tableta Gráfica', cantidad_requerida: 1 },
+            { rol_id: 2, tipo_equipo: "Laptop", cantidad_requerida: 1 },
+            { rol_id: 2, tipo_equipo: "Monitor", cantidad_requerida: 2 },
+            { rol_id: 2, tipo_equipo: "Tableta Gráfica", cantidad_requerida: 1 },
             // Gerente
 
-            
-            { rol_id: 3, tipo_equipo: 'Laptop', cantidad_requerida: 1 },
-            { rol_id: 3, tipo_equipo: 'Monitor', cantidad_requerida: 1 },
+            { rol_id: 3, tipo_equipo: "Laptop", cantidad_requerida: 1 },
+            { rol_id: 3, tipo_equipo: "Monitor", cantidad_requerida: 1 },
             // Soporte
-            { rol_id: 4, tipo_equipo: 'Laptop', cantidad_requerida: 1 },
-            { rol_id: 4, tipo_equipo: 'Monitor', cantidad_requerida: 1 },
+            { rol_id: 4, tipo_equipo: "Laptop", cantidad_requerida: 1 },
+            { rol_id: 4, tipo_equipo: "Monitor", cantidad_requerida: 1 },
         ]);
 
         // Empleados
         await Empleado.bulkCreate([
             {
-                nombre_completo: 'Administrador',
-                rol_actual: 'Admin',
-                email: 'admin@mail.com',
+                nombre_completo: "Administrador",
+                rol_actual: "Admin",
+                email: "admin@mail.com",
                 activo: true,
             },
             {
-                nombre_completo: 'Juan Pérez López',
-                rol_actual: 'Desarrollador',
-                email: 'juan.perez@mail.com',
+                nombre_completo: "Juan Pérez López",
+                rol_actual: "Desarrollador",
+                email: "juan.perez@mail.com",
                 activo: true,
             },
             {
-                nombre_completo: 'Ana Gómez Rodríguez',
-                rol_actual: 'Diseñador',
-                email: 'ana.gomez@mail.com',
+                nombre_completo: "Ana Gómez Rodríguez",
+                rol_actual: "Diseñador",
+                email: "ana.gomez@mail.com",
                 activo: true,
             },
         ]);
@@ -120,37 +174,36 @@ async function seedDatabase() {
         // Equipos
         await Equipo.bulkCreate([
             {
-                tipo_equipo: 'Laptop',
-                modelo: 'Dell XPS 15 9520',
-                numero_serie: 'XPS-001-2024',
-                estado: 'disponible',
-                costo: 24500.00
+                tipo_equipo: "Laptop",
+                modelo: "Dell XPS 15 9520",
+                numero_serie: "XPS-001-2024",
+                estado: "disponible",
+                costo: 24500.0,
             },
             {
-                tipo_equipo: 'Monitor',
-                modelo: 'Dell UltraSharp U2723QE',
-                numero_serie: 'MON-001-2024',
-                estado: 'disponible',
+                tipo_equipo: "Monitor",
+                modelo: "Dell UltraSharp U2723QE",
+                numero_serie: "MON-001-2024",
+                estado: "disponible",
                 costo: 8999.99,
             },
             {
-                tipo_equipo: 'Laptop',
+                tipo_equipo: "Laptop",
                 modelo: 'Apple MacBook Pro 14"',
-                numero_serie: 'MBP-001-2024',
-                estado: 'asignado',
-                costo: 42999.00,
+                numero_serie: "MBP-001-2024",
+                estado: "asignado",
+                costo: 42999.0,
             },
             {
-                tipo_equipo: 'Tableta Gráfica',
-                modelo: 'Wacom Intuos Pro Medium',
-                numero_serie: 'WAC-001-2024',
-                estado: 'disponible',
-                costo: 12499.50
+                tipo_equipo: "Tableta Gráfica",
+                modelo: "Wacom Intuos Pro Medium",
+                numero_serie: "WAC-001-2024",
+                estado: "disponible",
+                costo: 12499.5,
             },
         ]);
-
     } catch (error) {
-        console.error('Error creando datos: ', error);
+        console.error("Error creando datos: ", error);
     }
 }
 
@@ -163,25 +216,27 @@ async function startServer() {
     });
 }
 
-
-process.on('SIGTERM', async () => {
-    console.log('Recibida señal SIGTERM, cerrando servidor...');
+process.on("SIGTERM", async () => {
+    console.log("Recibida señal SIGTERM, cerrando servidor...");
     await sequelize.close();
-    console.log('Conexión a BD cerrada');
+    console.log("Conexión a BD cerrada");
     process.exit(0);
 });
 
 // Manejo de errores no capturados
-process.on('uncaughtException', (error: Error) => {
-    console.error('Error no capturado:', error);
+process.on("uncaughtException", (error: Error) => {
+    console.error("Error no capturado:", error);
 });
 
-process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
-    console.error('Promesa rechazada no manejada:', reason);
-});
+process.on(
+    "unhandledRejection",
+    (reason: unknown, promise: Promise<unknown>) => {
+        console.error("Promesa rechazada no manejada:", reason);
+    }
+);
 
 // Iniciar aplicación
 startServer().catch((error: Error) => {
-    console.error('Error al iniciar servidor:', error);
+    console.error("Error al iniciar servidor:", error);
     process.exit(1);
 });
