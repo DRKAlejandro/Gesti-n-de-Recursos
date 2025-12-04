@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EquipoService, EquipoStats } from '../../services/equipo';
+import { SolicitudService, SolicitudStats } from '../../services/solicitud';
+import { RolService, Rol } from '../../services/rol';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,25 +12,51 @@ import { EquipoService, EquipoStats } from '../../services/equipo';
 })
 export class Dashboard implements OnInit {
   estadisticas: EquipoStats | null = null;
+  estadisticasSolicitud: SolicitudStats | null = null;
+  roles: Rol | null = null;
   loading = false;
   loadingEstadisticas = false;
+  loadingSolicitudes = false;
   errorMessage = '';
   errorEstadisticas = '';
+  errorSolicitudes = '';
+  currentDate = new Date();
 
-  constructor(private equipoService: EquipoService) { }
+  constructor(private equipoService: EquipoService, private solicitudService: SolicitudService,) { }
 
   ngOnInit(): void {
-    this.cargarEstadisticas();
+    this.cargarEstadisticasEquipos();
+    this.cargarEstadisticasSolicitudes();
   }
 
-  cargarEstadisticas(): void {
+  cargarEstadisticasSolicitudes(): void {
+    this.loadingSolicitudes = true;
+    this.errorSolicitudes = '';
+    this.solicitudService.getEstadisticasSolicitudes().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.estadisticasSolicitud = response.data;
+          console.log('Solicitudes:', response.data);
+        } else {
+          this.errorSolicitudes = response.message || 'Error al cargar estadísticas de solicitudes';
+        }
+        this.loadingSolicitudes = false;
+      },
+      error: (error) => {
+        this.errorSolicitudes = error.message || 'Error de conexión con el servidor';
+        this.loadingSolicitudes = false;
+        console.error('Error al obtener estadisticas de solicitudes:', error);
+      }
+    });
+  }
+
+  cargarEstadisticasEquipos(): void {
     this.loadingEstadisticas = true;
     this.errorEstadisticas = '';
     this.equipoService.getEstadisticasEquipos().subscribe({
       next: (response) => {
         if (response.success) {
           this.estadisticas = response.data;
-          console.log(this.estadisticas);
         } else {
           this.errorEstadisticas = response.message || 'Error al cargar estadísticas';
         }
@@ -109,6 +137,8 @@ export class Dashboard implements OnInit {
   }
 
   recargarDatos(): void {
-    this.cargarEstadisticas();
+    this.cargarEstadisticasEquipos();
+    this.cargarEstadisticasSolicitudes();
+
   }
 }
