@@ -9,12 +9,20 @@ import {
 } from "./models";
 import equiposRouter from "./routes/equipos";
 import solicitudesRouter from "./routes/solicitudes";
+import rolesRouter from "./routes/roles";
+import empleadosRouter from "./routes/empleados";
+import detallesRouter from "./routes/detalles";
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:4200',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+})); app.use(express.json());
 
 app.use((req, res, next) => {
     console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -24,6 +32,9 @@ app.use((req, res, next) => {
 // Rutas
 app.use("/api/equipos", equiposRouter);
 app.use("/api/solicitudes", solicitudesRouter);
+app.use("/api/roles", rolesRouter);
+app.use("/api/empleados", empleadosRouter);
+app.use("/api/detalles", detallesRouter);
 
 app.get("/", (req, res) => {
     res.json({
@@ -131,22 +142,22 @@ async function seedDatabase() {
         // Requerimientos
         await PerfilRequerimiento.bulkCreate([
             // Administrador
-            { rol_id: 1, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad:100 },
-            { rol_id: 1, tipo_equipo: "Monitor", cantidad_requerida: 2, prioridad:50 },
+            { rol_id: 1, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad: 100 },
+            { rol_id: 1, tipo_equipo: "Monitor", cantidad_requerida: 2, prioridad: 50 },
             // Desarrollador
-            { rol_id: 2, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad:100 },
-            { rol_id: 2, tipo_equipo: "Monitor", cantidad_requerida: 2, prioridad:70 },
-            { rol_id: 2, tipo_equipo: "Dock", cantidad_requerida: 1, prioridad:50 },
+            { rol_id: 2, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad: 100 },
+            { rol_id: 2, tipo_equipo: "Monitor", cantidad_requerida: 2, prioridad: 70 },
+            { rol_id: 2, tipo_equipo: "Dock", cantidad_requerida: 1, prioridad: 50 },
             // Diseñador
-            { rol_id: 3, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad:100 },
-            { rol_id: 3, tipo_equipo: "Monitor", cantidad_requerida: 2, prioridad:20 },
-            { rol_id: 3, tipo_equipo: "Tableta Gráfica", cantidad_requerida: 1, prioridad:100 },
+            { rol_id: 3, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad: 100 },
+            { rol_id: 3, tipo_equipo: "Monitor", cantidad_requerida: 2, prioridad: 20 },
+            { rol_id: 3, tipo_equipo: "Tableta Gráfica", cantidad_requerida: 1, prioridad: 100 },
             // Gerente
-            { rol_id: 4, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad:100 },
-            { rol_id: 4, tipo_equipo: "Monitor", cantidad_requerida: 1, prioridad:10 },
+            { rol_id: 4, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad: 100 },
+            { rol_id: 4, tipo_equipo: "Monitor", cantidad_requerida: 1, prioridad: 10 },
             // Soporte
-            { rol_id: 5, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad:50 },
-            { rol_id: 5, tipo_equipo: "Monitor", cantidad_requerida: 1, prioridad:50 },
+            { rol_id: 5, tipo_equipo: "Laptop", cantidad_requerida: 1, prioridad: 50 },
+            { rol_id: 5, tipo_equipo: "Monitor", cantidad_requerida: 1, prioridad: 50 },
         ]);
 
         // Empleados
@@ -241,29 +252,29 @@ async function seedDatabase() {
 
         // Función para generar equipos con tipos definidos
         async function generarEquipos(
-            tipo: string, 
-            modelos: ModeloData[], 
-            cantidad: number, 
+            tipo: string,
+            modelos: ModeloData[],
+            cantidad: number,
             estados: ('disponible' | 'asignado' | 'baja' | 'mantenimiento')[] = ['disponible', 'asignado']
         ): Promise<any> {
             const equipos = [];
-            
+
             for (let i = 1; i <= cantidad; i++) {
                 const modeloIndex = Math.floor(Math.random() * modelos.length);
                 const modeloData = modelos[modeloIndex];
                 const estadoIndex = Math.floor(Math.random() * estados.length);
                 const estado = estados[estadoIndex];
-                
+
                 // Generar número de serie único
                 const numeroSerie = `${modeloData.marca.substring(0, 3).toUpperCase()}-${tipo.substring(0, 3).toUpperCase()}-${i.toString().padStart(3, '0')}-2025`;
-                
+
                 // Variar el precio +/- 10%
                 const variacion = (Math.random() * 0.2) - 0.1;
                 const costo = modeloData.basePrice * (1 + variacion);
-                
+
                 // Generar rendimiento aleatorio basado en el tipo
                 let rendimiento: number;
-                switch(tipo) {
+                switch (tipo) {
                     case 'Laptop':
                         rendimiento = Math.floor(Math.random() * 30) + 70; // 70-100
                         break;
@@ -276,7 +287,7 @@ async function seedDatabase() {
                     default:
                         rendimiento = Math.floor(Math.random() * 60) + 40; // 40-100
                 }
-                
+
                 equipos.push({
                     tipo_equipo: tipo,
                     modelo: `${modeloData.marca} ${modeloData.modelo}`,
@@ -288,21 +299,21 @@ async function seedDatabase() {
                     updated_at: new Date(),
                 });
             }
-            
+
             return await Equipo.bulkCreate(equipos);
         }
 
         // Generar 20 de cada tipo
         await generarEquipos('Laptop', laptopModels, 20, ['disponible', 'asignado', 'mantenimiento']);
-        
+
         await generarEquipos('Monitor', monitorModels, 20, ['disponible', 'asignado', 'baja']);
-        
+
         await generarEquipos('Tableta Gráfica', tabletModels, 20, ['disponible', 'asignado']);
-        
+
         await generarEquipos('Teléfono', telefonoModels, 20, ['disponible', 'asignado', 'mantenimiento']);
-        
+
         await generarEquipos('Impresora', impresoraModels, 20, ['disponible', 'asignado', 'baja']);
-        
+
         await generarEquipos('Dock', dockModels, 20, ['disponible', 'asignado']);
 
 

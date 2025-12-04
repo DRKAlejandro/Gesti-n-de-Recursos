@@ -3,6 +3,7 @@ import {
     crearSolicitud,
     listarSolicitudes,
     obtenerSolicitudPorId,
+    getEstadisticasSolicitudes
 } from '../services/solicitudService';
 import { generarPropuestaOptimaSolicitud } from "../services/solicitudService";
 
@@ -72,6 +73,26 @@ router.get('/', async (req, res) => {
             success: false,
             error: 'Error interno del servidor',
             message: error.message,
+        });
+    }
+});
+
+// GET /api/solicitudes/stats - Generar las estadisticas
+router.get('/stats', async (req, res) => {
+    try {
+        const estadisticas = await getEstadisticasSolicitudes();
+        
+        res.json({
+            success: true,
+            data: estadisticas,
+            message: 'Estadísticas obtenidas correctamente'
+        });
+    } catch (error: any) {
+        console.error('Error al obtener estadísticas de solicitudes:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al obtener estadísticas',
+            error: error.message
         });
     }
 });
