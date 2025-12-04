@@ -1,10 +1,17 @@
 import { Component } from '@angular/core';
 import { Header } from './components/header/header';
 import { Content } from './components/content/content';
+import { HttpClientModule } from '@angular/common/http';
+import { ApiService } from './services/api';
+import { EquipoService } from './services/equipo';
 
 @Component({
   selector: 'app-root',
-  imports: [Header, Content],
+  imports: [Header, Content, HttpClientModule],
+  providers: [
+    ApiService,
+    EquipoService
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
