@@ -6,6 +6,7 @@ import {
     PerfilRequerimiento
 } from '../models';
 import { generarPropuestaOptima } from './optimizadorService';
+import { Sequelize } from 'sequelize';
 
 // Interfaces
 export interface SolicitudInput {
@@ -286,5 +287,57 @@ export async function generarPropuestaOptimaSolicitud(solicitudId: number) {
             error: 'Error al generar propuesta',
             message: error.message,
         };
+    }
+}
+
+// Función para generar totales
+export async function getEstadisticasSolicitudes() {
+    try {
+        const resultados = await SolicitudEquipamiento.findAll({
+            attributes: [
+                'estado',
+                [Sequelize.fn('COUNT', Sequelize.col('id')), 'cantidad']
+            ],
+            group: ['estado'],
+            raw: true
+        });
+
+        let totalSolicitudes = 0;
+        const conteoPorEstado: Record<string, number> = {
+            'pendiente': 0,
+            'en_proceso': 0,
+            'resuelta': 0,
+            'rechazada': 0
+        };
+
+        resultados.forEach((item: any) => {
+            const estado = item.estado;
+            const cantidad = parseInt(item.cantidad);
+            
+            if (conteoPorEstado.hasOwnProperty(estado)) {
+                conteoPorEstado[estado] = cantidad;
+            }
+            totalSolicitudes += cantidad;
+        });
+
+        // Calcular porcentajes
+        const calcularPorcentaje = (count: number) => {
+            return totalSolicitudes > 0 ? (count / totalSolicitudes) * 100 : 0;
+        };
+
+        return {
+            total_solicitudes: totalSolicitudes,
+            total_pendiente: conteoPorEstado.pendiente,
+            total_en_proceso: conteoPorEstado['en_proceso'],
+            total_resuelta: conteoPorEstado.resuelta,
+            total_rechazada: conteoPorEstado.rechazada,
+            porcentaje_pendiente: calcularPorcentaje(conteoPorEstado.pendiente),
+            porcentaje_en_proceso: calcularPorcentaje(conteoPorEstado['en_proceso']),
+            porcentaje_resuelta: calcularPorcentaje(conteoPorEstado.resuelta),
+            porcentaje_rechazada: calcularPorcentaje(conteoPorEstado.rechazada),
+        };
+    } catch (error) {
+        console.error('Error en getEstadisticasSolicitudesOptimizado:', error);
+        throw error;
     }
 }

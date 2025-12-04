@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { Equipo, Empleado } from "../models";
-import { crearEquipo, listarEquipos } from "../services/equipoService";
+import { crearEquipo, listarEquipos, obtenerDatosGeneralesEquipos } from "../services/equipoService";
 
 const router = Router();
 
@@ -17,6 +17,25 @@ router.get("/", async (req, res) => {
         });
     } catch (error: any) {
         console.error("Error listando equipos:", error);
+        res.status(500).json({
+            success: false,
+            error: "Error interno del servidor",
+            message: error.message,
+        });
+    }
+});
+
+router.get("/stats", async (req, res) => {
+    try {
+        const datosGenerales = await obtenerDatosGeneralesEquipos();
+
+        res.json({
+            success: true,
+            data: datosGenerales,
+            message: "Estadísticas obtenidas exitosamente",
+        });
+    } catch (error: any) {
+        console.error("Error obteniendo estadísticas de equipos:", error);
         res.status(500).json({
             success: false,
             error: "Error interno del servidor",

@@ -36,11 +36,30 @@ export interface FiltrosEquipos {
   costo?: number;
 }
 
+export interface EquipoStats {
+  total_equipos: number;
+  total_disponible: number;
+  total_asignado: number;
+  total_mantenimiento: number;
+  total_baja: number;
+  porcentaje_disponible: number;
+  porcentaje_asignado: number;
+  porcentaje_mantenimiento: number;
+  porcentaje_baja: number;
+}
+
+export interface EquipoStatsResponse {
+  success: boolean;
+  data: EquipoStats;
+  message?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class EquipoService {
   private endpoint = '/api/equipos';
+  private statsEndpoint = '/api/equipos/stats';
 
   constructor(private apiService: ApiService) { }
 
@@ -75,4 +94,8 @@ export class EquipoService {
     return this.apiService.get<EquipoResponse>(this.endpoint, { estado });
   }
 
+
+  getEstadisticasEquipos(): Observable<any> {
+    return this.apiService.get<any>(this.statsEndpoint);
+  }
 }

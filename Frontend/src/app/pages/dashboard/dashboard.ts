@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Equipo, EquipoService, FiltrosEquipos } from '../../services/equipo';
+import { EquipoService, EquipoStats } from '../../services/equipo';
 
 @Component({
   selector: 'app-dashboard',
@@ -9,60 +9,106 @@ import { Equipo, EquipoService, FiltrosEquipos } from '../../services/equipo';
   styleUrls: ['./dashboard.css']
 })
 export class Dashboard implements OnInit {
-  equipos: Equipo[] = [];
+  estadisticas: EquipoStats | null = null;
   loading = false;
+  loadingEstadisticas = false;
   errorMessage = '';
-  filtros: FiltrosEquipos = {};
+  errorEstadisticas = '';
 
   constructor(private equipoService: EquipoService) { }
 
   ngOnInit(): void {
-    this.cargarEquipos();
+    this.cargarEstadisticas();
   }
 
-  cargarEquipos(): void {
-    this.loading = true;
-    this.errorMessage = '';
-
-    this.equipoService.getEquipos(this.filtros).subscribe({
+  cargarEstadisticas(): void {
+    this.loadingEstadisticas = true;
+    this.errorEstadisticas = '';
+    this.equipoService.getEstadisticasEquipos().subscribe({
       next: (response) => {
         if (response.success) {
-          this.equipos = response.data;
+          this.estadisticas = response.data;
+          console.log(this.estadisticas);
         } else {
-          this.errorMessage = response.message || 'Error al cargar equipos';
+          this.errorEstadisticas = response.message || 'Error al cargar estadísticas';
         }
-        this.loading = false;
+        this.loadingEstadisticas = false;
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Error de conexión con el servidor';
-        this.loading = false;
-        console.error('Error:', error);
+        this.errorEstadisticas = error.message || 'Error de conexión con el servidor';
+        this.loadingEstadisticas = false;
+        console.error('Error al cargar estadísticas:', error);
       }
     });
   }
 
-  // Contar equipos por estado
-  contarEquiposPorEstado(estado: string): number {
-    if (!this.equipos || this.equipos.length === 0) return 0;
-
-    return this.equipos.filter(equipo =>
-      equipo.estado?.toLowerCase() === estado.toLowerCase()
-    ).length;
+  get totalEquipos(): number {
+    return this.estadisticas?.total_equipos || 0;
   }
 
-  // Calcular porcentaje por estado específico
-  calcularPorcentajePorEstado(estado: string): number {
-    if (this.equipos.length === 0) return 0;
-
-    const cantidad = this.contarEquiposPorEstado(estado);
-    return Math.round((cantidad / this.equipos.length) * 100);
+  get totalDisponible(): number {
+    return this.estadisticas?.total_disponible || 0;
   }
 
-  // Calcular porcentaje de disponibilidad
-  calcularPorcentajeDisponibilidad(): number {
-    if (this.equipos.length === 0) return 0;
+  get totalAsignado(): number {
+    return this.estadisticas?.total_asignado || 0;
+  }
 
-    const disponibles = this.contarEquiposPorEstado('disponible');
-    return Math.round((disponibles / this.equipos.length) * 100);
+  get totalMantenimiento(): number {
+    return this.estadisticas?.total_mantenimiento || 0;
+  }
+
+  get totalBaja(): number {
+    return this.estadisticas?.total_baja || 0;
+  }
+
+  get porcentajeDisponible(): number {
+    return this.estadisticas?.porcentaje_disponible || 0;
+  }
+
+  get porcentajeAsignado(): number {
+    return this.estadisticas?.porcentaje_asignado || 0;
+  }
+
+  get porcentajeMantenimiento(): number {
+    return this.estadisticas?.porcentaje_mantenimiento || 0;
+  }
+
+  get porcentajeBaja(): number {
+    return this.estadisticas?.porcentaje_baja || 0;
+  }
+
+  getPorcentaje(estado: string): number {
+    switch (estado.toLowerCase()) {
+      case 'disponible':
+        return this.porcentajeDisponible;
+      case 'asignado':
+        return this.porcentajeAsignado;
+      case 'mantenimiento':
+        return this.porcentajeMantenimiento;
+      case 'baja':
+        return this.porcentajeBaja;
+      default:
+        return 0;
+    }
+  }
+
+  getTotal(estado: string): number {
+    switch (estado.toLowerCase()) {
+      case 'disponible':
+        return this.totalDisponible;
+      case 'asignado':
+        return this.totalAsignado;
+      case 'mantenimiento':
+        return this.totalMantenimiento;
+      case 'baja':
+        return this.totalBaja;
+      default:
+        return 0;
+    }
+  }
+
+  recargarDatos(): void {
+    this.cargarEstadisticas();
   }
 }
