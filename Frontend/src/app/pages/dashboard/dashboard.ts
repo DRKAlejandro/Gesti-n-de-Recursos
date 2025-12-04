@@ -1,20 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Equipo, EquipoService, FiltrosEquipos } from '../../services/equipo';
+
 @Component({
   selector: 'app-dashboard',
   imports: [CommonModule],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css']
 })
-
-export class Dashboard {
+export class Dashboard implements OnInit {
   equipos: Equipo[] = [];
   loading = false;
   errorMessage = '';
-  filtros: FiltrosEquipos = {
-    estado: 'disponible',
-  };
+  filtros: FiltrosEquipos = {};
+
   constructor(private equipoService: EquipoService) { }
 
   ngOnInit(): void {
@@ -40,5 +39,30 @@ export class Dashboard {
         console.error('Error:', error);
       }
     });
+  }
+
+  // Contar equipos por estado
+  contarEquiposPorEstado(estado: string): number {
+    if (!this.equipos || this.equipos.length === 0) return 0;
+
+    return this.equipos.filter(equipo =>
+      equipo.estado?.toLowerCase() === estado.toLowerCase()
+    ).length;
+  }
+
+  // Calcular porcentaje por estado específico
+  calcularPorcentajePorEstado(estado: string): number {
+    if (this.equipos.length === 0) return 0;
+
+    const cantidad = this.contarEquiposPorEstado(estado);
+    return Math.round((cantidad / this.equipos.length) * 100);
+  }
+
+  // Calcular porcentaje de disponibilidad
+  calcularPorcentajeDisponibilidad(): number {
+    if (this.equipos.length === 0) return 0;
+
+    const disponibles = this.contarEquiposPorEstado('disponible');
+    return Math.round((disponibles / this.equipos.length) * 100);
   }
 }

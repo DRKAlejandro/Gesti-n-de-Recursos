@@ -15,7 +15,6 @@ export interface Equipo {
   updatedAt?: Date;
 }
 
-
 export interface EquipoResponse {
   success: boolean;
   data: Equipo[];
