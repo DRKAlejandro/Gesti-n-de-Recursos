@@ -5,17 +5,9 @@
         <h1 class="text-3xl font-bold text-white">Solicitudes de Equipos</h1>
         <p class="text-primary-100 mt-2">Gestión y seguimiento de solicitudes de equipos</p>
       </div>
-      <div class="mt-4 md:mt-0 flex items-center space-x-4">
-        <div class="text-white inline-flex items-center px-4 py-2 bg-primary-300 backdrop-blur-sm rounded-lg">
-          Total: <span class="font-bold ml-2">{{ totalSolicitudes }} solicitudes</span>
-        </div>
-        <button (click)="mostrarModalCrearSolicitud()"
-          class="inline-flex items-center px-4 py-2.5 bg-white text-primary-600 hover:bg-primary-50 rounded-lg font-medium transition-colors shadow-sm">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Nueva Solicitud
-        </button>
+      <div
+        class="mt-4 md:mt-0 text-white inline-flex items-center px-4 py-2 bg-primary-300 backdrop-blur-sm rounded-lg">
+        Total: <span class="font-bold ml-2">{{ totalSolicitudes }} solicitudes</span>
       </div>
     </div>
   </div>
@@ -203,55 +195,6 @@
     </div>
   </div>
 
-  <!-- Modal para Propuesta Óptima -->
-  <div *ngIf="mostrarPropuestaOptima" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-4">
-        <div class="flex justify-between items-center">
-          <div>
-            <h3 class="text-xl font-bold">Propuesta Óptima de Equipos</h3>
-            <p class="text-blue-100 text-sm mt-1">
-              Para la solicitud #{{ solicitudSeleccionadaId }}
-            </p>
-          </div>
-          <button (click)="cerrarPropuestaOptima()" class="text-white hover:text-blue-200 transition-colors"
-            aria-label="Cerrar">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="overflow-y-auto max-h-[calc(90vh-80px)]">
-        <app-propuesta-optima *ngIf="solicitudSeleccionadaId" [solicitudId]="solicitudSeleccionadaId"
-          (cerrar)="cerrarPropuestaOptima()">
-        </app-propuesta-optima>
-      </div>
-    </div>
-  </div>
 
-  <div *ngIf="mostrarCrearSolicitudModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-      <div class="bg-gradient-to-r from-primary-600 to-primary-800 text-white px-6 py-4">
-        <div class="flex justify-between items-center">
-          <div>
-            <h3 class="text-xl font-bold">Crear Nueva Solicitud</h3>
-            <p class="text-primary-100 text-sm mt-1">
-              Complete el formulario para crear una nueva solicitud
-            </p>
-          </div>
-          <button (click)="cerrarModalCrearSolicitud()" class="text-white hover:text-primary-200 transition-colors"
-            aria-label="Cerrar">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      </div>
-      <div class="overflow-y-auto max-h-[calc(90vh-80px)]">
-        <app-crear-solicitud *ngIf="mostrarCrearSolicitudModal" (solicitudCreada)="cerrarModalCrearSolicitud()">
-        </app-crear-solicitud>
-      </div>
-    </div>
-  </div>
+
 </div>
