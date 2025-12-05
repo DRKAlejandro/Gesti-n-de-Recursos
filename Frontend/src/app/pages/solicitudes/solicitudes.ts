@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { SolicitudService, Solicitud, FiltrosSolicitudes, SolicitudListResponse } from '../../services/solicitud';
 import { RolService, Rol, RolResponse } from '../../services/rol';
 import { DetailsComponent } from '../../components/details/details';
+import { PropuestaOptimaComponent } from '../../components/propuesta-optima/propuesta-optima'; // Asegúrate de tener esta importación
+import { CrearSolicitudComponent } from '../../components/crear-solicitud/crear-solicitud';
+
 
 export interface NuevaSolicitudRequest {
   nombre_solicitud: string;
@@ -16,7 +19,7 @@ export interface NuevaSolicitudRequest {
 }
 @Component({
   selector: 'app-solicitudes',
-  imports: [CommonModule, FormsModule, DetailsComponent],
+  imports: [CommonModule, FormsModule, DetailsComponent, PropuestaOptimaComponent, CrearSolicitudComponent],
   templateUrl: './solicitudes.html',
   styleUrls: ['./solicitudes.css']
 })
@@ -29,7 +32,9 @@ export class Solicitudes implements OnInit {
   loadingRoles = false;
   successMessage = '';
   mostrarDetallesModal = false;
+  mostrarPropuestaOptima = false;
   solicitudSeleccionadaId: number | null = null;
+  mostrarCrearSolicitudModal = false;
 
   estados = [
     { value: 'pendiente', label: 'Pendiente', color: 'yellow' },
@@ -143,7 +148,23 @@ export class Solicitudes implements OnInit {
     this.mostrarDetallesModal = false;
     this.solicitudSeleccionadaId = null;
   }
-   generarPropuestaOptima(solicitud: Solicitud): void {
 
+  generarPropuestaOptima(solicitud: Solicitud): void {
+    this.solicitudSeleccionadaId = solicitud.id ?? null;
+    this.mostrarPropuestaOptima = true;
+  }
+
+  cerrarPropuestaOptima(): void {
+    this.mostrarPropuestaOptima = false;
+    this.solicitudSeleccionadaId = null;
+  }
+
+  mostrarModalCrearSolicitud(): void {
+    this.mostrarCrearSolicitudModal = true;
+  }
+
+  cerrarModalCrearSolicitud(): void {
+    this.mostrarCrearSolicitudModal = false;
+    this.cargarSolicitudes();
   }
 }
