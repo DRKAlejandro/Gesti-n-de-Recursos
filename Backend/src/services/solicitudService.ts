@@ -94,6 +94,7 @@ export async function crearSolicitud(solicitudData: SolicitudInput) {
             creado_por: solicitudData.creado_por,
             comentarios: solicitudData.comentarios ? solicitudData.comentarios.trim() : undefined,
             estado: 'pendiente',
+            fecha: new Date(),
         });
 
         // Detalles de la solicitud

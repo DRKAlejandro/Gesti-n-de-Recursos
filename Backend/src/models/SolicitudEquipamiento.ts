@@ -6,6 +6,7 @@ interface SolicitudEquipamientoAttributes {
     nombre_solicitud: string;
     estado: 'pendiente' | 'resuelta' | 'rechazada' | 'en_proceso';
     creado_por: number;
+    fecha: Date;
     comentarios?: string;
     created_at?: Date;
     updated_at?: Date;
@@ -23,7 +24,7 @@ class SolicitudEquipamiento extends Model<
     public estado!: 'pendiente' | 'resuelta' | 'rechazada' | 'en_proceso';
     public creado_por!: number;
     public comentarios!: string;
-
+    public fecha!: Date;
     public readonly created_at!: Date;
     public readonly updated_at!: Date;
 }
@@ -58,6 +59,11 @@ SolicitudEquipamiento.init(
                 key: 'id',
             },
         },
+        fecha: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+        },
         comentarios: {
             type: DataTypes.TEXT,
             allowNull: true,
@@ -73,6 +79,10 @@ SolicitudEquipamiento.init(
             {
                 name: 'idx_solicitud_estado',
                 fields: ['estado'],
+            },
+            {
+                name: 'idx_solicitud_fecha',
+                fields: ['fecha'],
             },
             {
                 name: 'idx_solicitud_creado_por',
