@@ -91,35 +91,33 @@ export interface SolicitudStats {
 }
 
 export interface PropuestaOptima {
+  success: boolean;
   solicitud_id: number;
-  total_equipos_necesarios: number;
-  propuesta: Array<{
-    rol_id: number;
-    rol_nombre: string;
-    cantidad_puestos: number;
-    equipos_asignados: Array<{
+  asignaciones: Array<{
+    rol: string;
+    puesto: number;
+    equipos: Array<{
       equipo_id: number;
       tipo_equipo: string;
-      modelo: string;
-      estado: string;
       costo: number;
     }>;
-    faltante: number;
+    costo_total_puesto: number;
   }>;
-  equipos_necesarios: Array<{
+  costo_total_estimado: number;
+  faltantes: Array<{
+    rol: string;
     tipo_equipo: string;
-    cantidad: number;
+    cantidad_faltante: number;
   }>;
-  costo_total: number;
-  comentarios: string[];
+  mensaje: string;
 }
+
 
 export interface PropuestaOptimaResponse {
   success: boolean;
   data: PropuestaOptima;
   message?: string;
 }
-
 @Injectable({
   providedIn: 'root'
 })
