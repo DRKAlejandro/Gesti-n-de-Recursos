@@ -48,7 +48,7 @@
   --color-info-700: #1D4ED8;
 }
 
-@utility bg-primary {
+.bg-primary {
   background-color: var(--color-primary-500);
 }
 

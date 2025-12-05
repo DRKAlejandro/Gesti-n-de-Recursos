@@ -27,7 +27,6 @@ export class RolService {
   constructor(private apiService: ApiService) { }
   // Listdao de equipos por filtros
     getRoles(): Observable<RolResponse> {
-      console.log(this.endpoint);
       return this.apiService.get<RolResponse>(this.endpoint);
     }
 }

@@ -28,8 +28,6 @@ export class Header {
       this.currentPageTitle = 'Inventario';
     } else if (currentUrl.includes('/solicitudes')) {
       this.currentPageTitle = 'Solicitudes';
-    } else if (currentUrl.includes('/asignacion')) {
-      this.currentPageTitle = 'Asignación';
     } else {
       this.currentPageTitle = 'Dashboard';
     }

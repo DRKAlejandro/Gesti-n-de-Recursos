@@ -13,7 +13,8 @@ import { SolicitudService } from './services/solicitud';
   providers: [
     ApiService,
     EquipoService,
-    SolicitudService
+    SolicitudService,
+    RolService
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

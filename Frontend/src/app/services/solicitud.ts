@@ -13,6 +13,11 @@ export interface DetalleSolicitud {
   };
 }
 
+export interface DetalleSolicitudResponse {
+  success: boolean;
+  data: DetalleSolicitud[];
+  message?: string;
+}
 export interface Empleado {
   id: number;
   nombre_completo: string;
@@ -23,8 +28,8 @@ export interface Solicitud {
   id?: number;
   creado_por: number;
   estado: 'pendiente' | 'resuelta' | 'rechazada' | 'en_proceso';
-  observaciones?: string;
-  fecha_requerida: Date;
+  comentarios?: string;
+  fecha: Date;
   createdAt?: Date;
   updatedAt?: Date;
   creador?: Empleado;
@@ -106,7 +111,7 @@ export interface PropuestaOptima {
     cantidad: number;
   }>;
   costo_total: number;
-  observaciones: string[];
+  comentarios: string[];
 }
 
 export interface PropuestaOptimaResponse {

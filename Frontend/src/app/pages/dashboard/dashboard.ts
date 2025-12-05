@@ -36,7 +36,6 @@ export class Dashboard implements OnInit {
       next: (response) => {
         if (response.success) {
           this.estadisticasSolicitud = response.data;
-          console.log('Solicitudes:', response.data);
         } else {
           this.errorSolicitudes = response.message || 'Error al cargar estadísticas de solicitudes';
         }
